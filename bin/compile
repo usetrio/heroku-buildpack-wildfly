@@ -22,11 +22,11 @@ install_java_with_overlay ${BUILD_DIR}
 
 WILDFLY_VERSION="12.0.0.Final"
 WILDFLY_SHA1="b2039cc4979c7e50a0b6ee0e5153d13d537d492f"
-JBOSS_HOME="/app/.jboss/wildfly-${WILDFLY_VERSION}"
+JBOSS_HOME=".jboss/wildfly-${WILDFLY_VERSION}"
 
 cd $BUILD_DIR
 
-mkdir -p /app/.jboss
+mkdir -p .jboss
 
 echo -n "-----> Installing Wildfly ${WILDFLY_VERSION}... "
 curl -O http://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz
@@ -54,5 +54,5 @@ EOF
 fi
 
 cat << EOF > $BUILD_DIR/.profile.d/jboss.sh
-export JBOSS_HOME=${JBOSS_HOME}
+#export JBOSS_HOME=${JBOSS_HOME}
 EOF
