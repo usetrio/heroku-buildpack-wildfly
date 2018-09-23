@@ -63,7 +63,7 @@ $JBOSS_HOME/bin/jboss-cli.sh --file=/tmp/wildfly-mysql-connector-java-installer
 echo "MySQL wildfly module installed successfully"
 $JBOSS_HOME/bin/jboss-cli.sh --connect command=:shutdown
 echo "wildfly server stopped"
-cp $BP_DIR/template/standalone.xml $JBOSS_HOME/wildfly-$WILDFLY_VERSION/standalone/configuration/
+cp $BP_DIR/template/standalone.xml $JBOSS_HOME/standalone/configuration/
 echo "standalone.xml datasource configured"
 rm $JBOSS_HOME/mysql-connector-java-$MYSQL_DRIVER_VERSION.jar
 echo "done"
