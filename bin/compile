@@ -50,7 +50,7 @@ sha1sum mysql-connector-java-$MYSQL_DRIVER_VERSION.jar | grep $MYSQL_DRIVER_SHA1
 echo "verified"
 nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 &
 echo "initializing and waiting for wildfly standalone gets up..."
-until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do; printf '.'; sleep 5; done
+until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do printf '.'; sleep 5; done
 cat << EOF > /tmp/wildfly-mysql-connector-java-installer
 connect
 module add --name=com.mysql --resources=$BP_DIR/mysql-connector-java-$MYSQL_DRIVER_VERSION.jar --dependencies=javax.api,javax.transaction.api
