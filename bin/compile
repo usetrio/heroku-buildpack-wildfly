@@ -22,6 +22,8 @@ install_java_with_overlay ${BUILD_DIR}
 
 WILDFLY_VERSION="12.0.0.Final"
 WILDFLY_SHA1="b2039cc4979c7e50a0b6ee0e5153d13d537d492f"
+MYSQL_DRIVER_VERSION="8.0.11"
+MYSQL_DRIVER_SHA1="2c3d25fe1dfdd6496e0bbe47d67809f67487cfba"
 JBOSS_HOME=".jboss/wildfly-${WILDFLY_VERSION}"
 
 cd $BUILD_DIR
@@ -40,7 +42,29 @@ echo "moved"
 rm wildfly-$WILDFLY_VERSION.tar.gz
 echo "done"
 
-echo -n "-----> Deploying war file(s)... "
+
+echo -n "-----> Installing MySQL Wildfly module... "
+curl -O http://central.maven.org/maven2/mysql/mysql-connector-java/$MYSQL_DRIVER_VERSION/mysql-connector-java-$MYSQL_DRIVER_VERSION.jar
+echo "downloaded"
+sha1sum mysql-connector-java-$MYSQL_DRIVER_VERSION.jar | grep $MYSQL_DRIVER_SHA1 > /dev/null 2>&1
+echo "verified"
+nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 &
+echo "initializing and waiting for wildfly standalone gets up..."
+until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do; printf '.'; sleep 5; done
+cat << EOF > /tmp/wildfly-mysql-connector-java-installer
+connect
+module add --name=com.mysql --resources=$BP_DIR/mysql-connector-java-$MYSQL_DRIVER_VERSION.jar --dependencies=javax.api,javax.transaction.api
+/subsystem=datasources/jdbc-driver=mysql:add(driver-name="mysql",driver-module-name="com.mysql",driver-class-name=com.mysql.cj.jdbc.Driver)
+quit
+EOF
+$JBOSS_HOME/bin/jboss-cli.sh --file=/tmp/wildfly-mysql-connector-java-installer
+echo "MySQL wildfly module installed successfully"
+$JBOSS_HOME/bin/jboss-cli.sh --connect command=:shutdown
+echo "wildfly server stopped"
+cp $BP_DIR/template/standalone.xml $JBOSS_HOME/wildfly-$WILDFLY_VERSION/standalone/configuration/
+echo "standalone.xml datasource configured"
+
+echo -n "-----> Deploying war file(s)..."
 cp target/*.war $JBOSS_HOME/standalone/deployments/
 echo "done"
 

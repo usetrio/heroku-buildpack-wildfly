@@ -1,10 +1,15 @@
-# Heroku Wildfly Buildpack
+# Heroku Wildfly Buildpack + MySQL module
 
 This is a [Heroku Buildpack](https://devcenter.heroku.com/articles/buildpacks) for running [Wildfly AS](http://wildfly.org).
 
 ## Usage
 
-Put your WAR file(s) in `target/` and deploy.
+1. Set the MySQL env variables:
+- MYSQL_DB_HOST # e.g. jdbc:mysql://127.0.0.1:3306/gsf_project?useLegacyDatetimeCode=false&serverTimezone=UTC
+- MYSQL_DB_USER # e.g. root
+- MYSQL_DB_PASS # e.g. root
+
+2. Put your WAR file(s) in `target/` and deploy.
 
 ## Using with the Java buildpack
 
