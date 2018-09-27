@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 # bin/compile <build-dir> <cache-dir> <env-dir>
 
-# fail fast
 set -e
 
-BP_DIR=$(cd $(dirname $0)/..; pwd) # absolute path
+BP_DIR=$(cd $(dirname $0)/..; pwd)
 BIN_DIR=$BP_DIR/bin
 
-# parse args
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
@@ -22,9 +20,9 @@ install_java_with_overlay ${BUILD_DIR}
 
 WILDFLY_VERSION="12.0.0.Final"
 WILDFLY_SHA1="b2039cc4979c7e50a0b6ee0e5153d13d537d492f"
+JBOSS_HOME=".jboss/wildfly-${WILDFLY_VERSION}"
 MYSQL_DRIVER_VERSION="8.0.11"
 MYSQL_DRIVER_SHA1="2c3d25fe1dfdd6496e0bbe47d67809f67487cfba"
-JBOSS_HOME=".jboss/wildfly-${WILDFLY_VERSION}"
 
 cd $BUILD_DIR
 
@@ -63,24 +61,7 @@ $JBOSS_HOME/bin/jboss-cli.sh --file=/tmp/wildfly-mysql-connector-java-installer
 echo "MySQL wildfly module installed successfully"
 $JBOSS_HOME/bin/jboss-cli.sh --connect command=:shutdown
 echo "wildfly server stopped"
-cp $BP_DIR/template/standalone.xml $JBOSS_HOME/standalone/configuration/
+patch $JBOSS_HOME/standalone/configuration/standalone.xml -i $BP_DIR/standalone.xml.patch -o $JBOSS_HOME/standalone/configuration/standalone.xml
 echo "standalone.xml datasource configured"
 rm $JBOSS_HOME/mysql-connector-java-$MYSQL_DRIVER_VERSION.jar
 echo "done"
-
-echo -n "-----> Deploying war file(s)..."
-cp target/*.war $JBOSS_HOME/standalone/deployments/
-echo "done"
-
-echo "-----> Creating configuration..."
-if [ -f $BUILD_DIR/Procfile ]; then
-  echo "        - Using existing process types"
-else
-  cat << EOF > $BUILD_DIR/Procfile
-web: \$JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=\$PORT
-EOF
-fi
-
-cat << EOF > $BUILD_DIR/.profile.d/jboss.sh
-export JBOSS_HOME=${JBOSS_HOME}
-EOF

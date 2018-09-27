@@ -1,0 +1,37 @@
+--- standalone.xml	2018-09-27 10:52:19.000000000 -0400
++++ standalone.xml	2018-09-27 10:54:09.000000000 -0400
+@@ -148,10 +148,34 @@
+                         <password>sa</password>
+                     </security>
+                 </datasource>
++                <datasource jta="true" jndi-name="java:jboss/datasources/MySQLDS" pool-name="MySQLDS" enabled="true" use-ccm="false">
++                    <connection-url>${env.MYSQL_DB_HOST}</connection-url>
++                    <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
++                    <driver>mysql</driver>
++                    <pool>
++                        <min-pool-size>5</min-pool-size>
++                        <max-pool-size>10</max-pool-size>
++                        <prefill>false</prefill>
++                        <use-strict-min>false</use-strict-min>
++                        <flush-strategy>IdleConnections</flush-strategy>
++                    </pool>
++                    <security>
++                        <user-name>${env.MYSQL_DB_USER}</user-name>
++                        <password>${env.MYSQL_DB_PASS}</password>
++                    </security>
++                    <validation>
++                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
++                        <background-validation>true</background-validation>
++                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
++                    </validation>
++                </datasource>
+                 <drivers>
+                     <driver name="h2" module="com.h2database.h2">
+                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+                     </driver>
++                    <driver name="mysql" module="com.mysql">
++                        <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
++                    </driver>
+                 </drivers>
+             </datasources>
+         </subsystem>
