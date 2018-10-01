@@ -1,12 +1,2 @@
 #!/usr/bin/env bash
 # bin/release <build-dir>
-
-set -e
-
-BUILD_DIR=$1
-WILDFLY_VERSION="12.0.0.Final"
-JBOSS_HOME=".jboss/wildfly-${WILDFLY_VERSION}"
-
-echo -n "-----> Deploying war file(s)..."
-cp target/*.war $JBOSS_HOME/standalone/deployments/
-echo "done"

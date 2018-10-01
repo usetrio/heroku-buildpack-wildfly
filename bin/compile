@@ -40,7 +40,6 @@ echo "moved"
 rm wildfly-$WILDFLY_VERSION.tar.gz
 echo "done"
 
-
 echo -n "-----> Installing MySQL Wildfly module... "
 curl -O http://central.maven.org/maven2/mysql/mysql-connector-java/$MYSQL_DRIVER_VERSION/mysql-connector-java-$MYSQL_DRIVER_VERSION.jar
 echo "downloaded"
@@ -65,6 +64,10 @@ mv $JBOSS_HOME/standalone/configuration/standalone.xml $JBOSS_HOME/standalone/co
 patch $JBOSS_HOME/standalone/configuration/standalone.before-patch.xml -i $BP_DIR/standalone.xml.patch -o $JBOSS_HOME/standalone/configuration/standalone.xml
 echo "standalone.xml datasource configured"
 rm $JBOSS_HOME/mysql-connector-java-$MYSQL_DRIVER_VERSION.jar
+echo "done"
+
+echo -n "-----> Deploying war file(s)..."
+find ./target -name \*.war -exec cp {} $JBOSS_HOME/standalone/deployments \;
 echo "done"
 
 echo "-----> Creating configuration..."
