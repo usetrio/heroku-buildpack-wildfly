@@ -4,10 +4,10 @@
                          <password>sa</password>
                      </security>
                  </datasource>
-+                <datasource jta="true" jndi-name="java:jboss/datasources/MySQLDS" pool-name="MySQLDS" enabled="true" use-ccm="false">
-+                    <connection-url>${env.MYSQL_DB_HOST}</connection-url>
-+                    <driver-class>com.mysql.cj.jdbc.Driver</driver-class>
-+                    <driver>mysql</driver>
++                <datasource jta="true" jndi-name="java:jboss/datasources/postgres" pool-name="DS" enabled="true" use-ccm="false">
++                    <connection-url>${env.POSTGRES_DB_HOST}</connection-url>
++                    <driver-class>org.postgresql.Driver</driver-class>
++                    <driver>postgresql</driver>
 +                    <pool>
 +                        <min-pool-size>5</min-pool-size>
 +                        <max-pool-size>10</max-pool-size>
@@ -16,13 +16,13 @@
 +                        <flush-strategy>IdleConnections</flush-strategy>
 +                    </pool>
 +                    <security>
-+                        <user-name>${env.MYSQL_DB_USER}</user-name>
-+                        <password>${env.MYSQL_DB_PASS}</password>
++                        <user-name>${env.POSTGRES_DB_USER}</user-name>
++                        <password>${env.POSTGRES_DB_PASS}</password>
 +                    </security>
 +                    <validation>
-+                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker"/>
-+                        <background-validation>true</background-validation>
-+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter"/>
++                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker">
++                        </valid-connection-checker>
++                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter"></exception-sorter>
 +                    </validation>
 +                </datasource>
                  <drivers>

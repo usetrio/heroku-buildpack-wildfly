@@ -21,8 +21,8 @@ install_java_with_overlay ${BUILD_DIR}
 WILDFLY_VERSION="12.0.0.Final"
 WILDFLY_SHA1="b2039cc4979c7e50a0b6ee0e5153d13d537d492f"
 JBOSS_HOME=".jboss/wildfly-${WILDFLY_VERSION}"
-MYSQL_DRIVER_VERSION="8.0.11"
-MYSQL_DRIVER_SHA1="2c3d25fe1dfdd6496e0bbe47d67809f67487cfba"
+POSTGRES_DRIVER_VERSION="9.4-1206-jdbc42"
+POSTGRES_DRIVER_SHA1="e91af69cfb3390a73449d1157753ca4e7b97765c"
 
 cd $BUILD_DIR
 
@@ -40,30 +40,28 @@ echo "moved"
 rm wildfly-$WILDFLY_VERSION.tar.gz
 echo "done"
 
-echo -n "-----> Installing MySQL Wildfly module... "
-curl -O http://central.maven.org/maven2/mysql/mysql-connector-java/$MYSQL_DRIVER_VERSION/mysql-connector-java-$MYSQL_DRIVER_VERSION.jar
+echo -n "-----> Installing Postgres Wildfly module... "
+curl -O http://central.maven.org/maven2/org/postgresql/postgresql/$POSTGRES_DRIVER_VERSION/postgresql-$POSTGRES_DRIVER_VERSION.jar
 echo "downloaded"
-sha1sum mysql-connector-java-$MYSQL_DRIVER_VERSION.jar | grep $MYSQL_DRIVER_SHA1 > /dev/null 2>&1
+sha1sum postgresql-$POSTGRES_DRIVER_VERSION.jar | grep $POSTGRES_DRIVER_SHA1 > /dev/null 2>&1
 echo "verified"
-mv mysql-connector-java-$MYSQL_DRIVER_VERSION.jar $JBOSS_HOME
-echo "moved"
-nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 > /dev/null 2>&1 &
+nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=$PORT > $JBOSS_DIR/jboss.log 2>&1 &
 echo "initializing and waiting for wildfly standalone gets up..."
-until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do printf '.'; sleep 5; done
-cat << EOF > /tmp/wildfly-mysql-connector-java-installer
+until $(curl --output /dev/null --silent --head --fail http://localhost:$PORT); do printf '.'; sleep 5; done
+cat << EOF > $TMP_DIR/wildfly-postgres-connector-java-installer
 connect
-module add --name=com.mysql --resources=$JBOSS_HOME/mysql-connector-java-$MYSQL_DRIVER_VERSION.jar --dependencies=javax.api,javax.transaction.api
-/subsystem=datasources/jdbc-driver=mysql:add(driver-name="mysql",driver-module-name="com.mysql",driver-class-name=com.mysql.cj.jdbc.Driver)
+module add --name=org.postgresql --resources=$TMP_DIR/postgresql-$POSTGRES_DRIVER_VERSION.jar --dependencies=javax.api,javax.transaction.api
+/subsystem=datasources/jdbc-driver=postgresql:add(driver-name="postgresql",driver-module-name="org.postgresql",driver-class-name=org.postgresql.Driver)
 quit
 EOF
-$JBOSS_HOME/bin/jboss-cli.sh --file=/tmp/wildfly-mysql-connector-java-installer
-echo "MySQL wildfly module installed successfully"
+$JBOSS_HOME/bin/jboss-cli.sh --file=$TMP_DIR/wildfly-postgres-connector-java-installer
+echo "Postgres wildfly module installed successfully"
 $JBOSS_HOME/bin/jboss-cli.sh --connect command=:shutdown
 echo "wildfly server stopped"
 mv $JBOSS_HOME/standalone/configuration/standalone.xml $JBOSS_HOME/standalone/configuration/standalone.before-patch.xml
 patch $JBOSS_HOME/standalone/configuration/standalone.before-patch.xml -i $BP_DIR/standalone.xml.patch -o $JBOSS_HOME/standalone/configuration/standalone.xml
 echo "standalone.xml datasource configured"
-rm $JBOSS_HOME/mysql-connector-java-$MYSQL_DRIVER_VERSION.jar
+rm $JBOSS_HOME/postgres-connector-java-$POSTGRES_DRIVER_VERSION.jar
 echo "done"
 
 echo -n "-----> Deploying war file(s)..."
