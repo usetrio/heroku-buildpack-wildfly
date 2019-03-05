@@ -9,12 +9,9 @@ BIN_DIR=$BP_DIR/bin
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
+TMP_DIR=/tmp
 
-IFS=':' read -r -a variables <<< "$DATABASE_URL"
-POSTGRES_DB_USER=(${variables[1]//\/\//})
-IFS='@' read -r -a PASSWORD_HOST <<< "${variables[2]}"
-POSTGRES_DB_PASS=${PASSWORD_HOST[0]}
-POSTGRES_DB_HOST="jdbc:postgresql://${PASSWORD_HOST[1]}:${variables[3]}"
+source $BP_DIR/.profile.d/jboss
 
 JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-"https://codon-buildpacks.s3.amazonaws.com/buildpacks/heroku/jvm-common.tgz"}
 mkdir -p /tmp/jvm-common
@@ -23,12 +20,6 @@ curl --retry 3 --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-c
 . /tmp/jvm-common/bin/java
 
 install_java_with_overlay ${BUILD_DIR}
-
-WILDFLY_VERSION="12.0.0.Final"
-WILDFLY_SHA1="b2039cc4979c7e50a0b6ee0e5153d13d537d492f"
-JBOSS_HOME=".jboss/wildfly-${WILDFLY_VERSION}"
-POSTGRES_DRIVER_VERSION="9.4-1206-jdbc42"
-POSTGRES_DRIVER_SHA1="e91af69cfb3390a73449d1157753ca4e7b97765c"
 
 cd $BUILD_DIR
 

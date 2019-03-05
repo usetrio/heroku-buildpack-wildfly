@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+
+# TODO: We should warn the user and skip this logic if $DATABASE_URL is not defined
+
+IFS=':' read -r -a variables <<< "$DATABASE_URL"
+POSTGRES_DB_USER=(${variables[1]//\/\//})
+IFS='@' read -r -a PASSWORD_HOST <<< "${variables[2]}"
+POSTGRES_DB_PASS=${PASSWORD_HOST[0]}
+POSTGRES_DB_HOST="jdbc:postgresql://${PASSWORD_HOST[1]}:${variables[3]}"
