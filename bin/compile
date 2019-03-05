@@ -60,7 +60,7 @@ echo "wildfly server stopped"
 mv $JBOSS_HOME/standalone/configuration/standalone.xml $JBOSS_HOME/standalone/configuration/standalone.before-patch.xml
 patch $JBOSS_HOME/standalone/configuration/standalone.before-patch.xml -i $BP_DIR/standalone.xml.patch -o $JBOSS_HOME/standalone/configuration/standalone.xml
 echo "standalone.xml datasource configured"
-rm $JBOSS_HOME/postgres-connector-java-$POSTGRES_DRIVER_VERSION.jar
+rm $JBOSS_HOME/postgresql-$POSTGRES_DRIVER_VERSION.jar
 echo "done"
 
 echo -n "-----> Deploying war file(s)..."
