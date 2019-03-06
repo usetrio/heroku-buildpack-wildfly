@@ -10,6 +10,3 @@ export POSTGRES_DRIVER_SHA1=${POSTGRES_DRIVER_SHA1:-"951b7eda125f3137538a94e2cbd
 export JBOSS_FOLDER=".jboss"
 export JBOSS_BUILD_DIR="${JBOSS_FOLDER}/wildfly-${WILDFLY_VERSION}"
 export JBOSS_HOME="${HOME}/${JBOSS_BUILD_DIR}"
-
-export JBOSS_LOG_MANAGER_LIB="$(echo $JBOSS_HOME/modules/system/layers/base/org/jboss/logmanager/main/jboss-logmanager-*.jar)" # resolve logmanager jar
-export JAVA_OPT+=" -Xbootclasspath/p:$JBOSS_LOG_MANAGER_LIB  -Djboss.modules.system.pkgs=org.jboss.byteman,org.jboss.logmanager  -Djava.util.logging.manager=org.jboss.logmanager.LogManager" # register jboss logmanager at jvm early startup
