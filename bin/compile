@@ -28,7 +28,7 @@ cd $BUILD_DIR
 source $BP_DIR/.profile.d/jboss.sh
 source $BP_DIR/.profile.d/postgres.sh
 
-mkdir -p $JBOSS_BUILD_DIR
+mkdir -p $JBOSS_FOLDER
 
 echo -n "-----> Installing Wildfly ${WILDFLY_VERSION}... "
 curl -O http://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz
@@ -37,7 +37,7 @@ sha1sum wildfly-$WILDFLY_VERSION.tar.gz | grep $WILDFLY_SHA1 > /dev/null 2>&1
 echo "verified"
 tar xf wildfly-$WILDFLY_VERSION.tar.gz
 echo "extracted"
-mv wildfly-$WILDFLY_VERSION/* $JBOSS_BUILD_DIR
+mv wildfly-$WILDFLY_VERSION $JBOSS_FOLDER
 echo "moved"
 rm wildfly-$WILDFLY_VERSION.tar.gz
 echo "done"
