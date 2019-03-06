@@ -9,7 +9,6 @@ BIN_DIR=$BP_DIR/bin
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
-TMP_DIR=/tmp
 
 BUILDPACK_STDLIB_URL="https://lang-common.s3.amazonaws.com/buildpack-stdlib/v7/stdlib.sh"
 source <(curl -s --retry 3 -L $BUILDPACK_STDLIB_URL)
@@ -25,13 +24,11 @@ curl --retry 3 --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-c
 install_java_with_overlay ${BUILD_DIR}
 
 cd $BUILD_DIR
-echo "build_dir is ${BUILD_DIR}"
 
 source $BP_DIR/.profile.d/jboss.sh
 source $BP_DIR/.profile.d/postgres.sh
 
 mkdir -p $JBOSS_HOME
-echo "jboss_home is ${JBOSS_HOME}"
 
 echo -n "-----> Installing Wildfly ${WILDFLY_VERSION}... "
 curl -O http://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz
@@ -40,7 +37,7 @@ sha1sum wildfly-$WILDFLY_VERSION.tar.gz | grep $WILDFLY_SHA1 > /dev/null 2>&1
 echo "verified"
 tar xf wildfly-$WILDFLY_VERSION.tar.gz
 echo "extracted"
-mv wildfly-$WILDFLY_VERSION $JBOSS_HOME
+mv wildfly-$WILDFLY_VERSION/* $JBOSS_HOME
 echo "moved"
 rm wildfly-$WILDFLY_VERSION.tar.gz
 echo "done"
@@ -56,14 +53,15 @@ echo "moved"
 nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 &
 echo "initializing and waiting for wildfly standalone gets up..."
 until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do printf '.'; sleep 5; done
-cat << EOF > $TMP_DIR/wildfly-postgres-connector-java-installer
+cat << EOF > $BUILD_DIR/wildfly-postgres-connector-java-installer
 connect
 module add --name=org.postgresql --resources=$JBOSS_HOME/postgresql-$POSTGRES_DRIVER_VERSION.jar --dependencies=javax.api,javax.transaction.api
 /subsystem=datasources/jdbc-driver=postgresql:add(driver-name="postgresql",driver-module-name="org.postgresql",driver-class-name=org.postgresql.Driver)
 quit
 EOF
-$JBOSS_HOME/bin/jboss-cli.sh --file=$TMP_DIR/wildfly-postgres-connector-java-installer
+$JBOSS_HOME/bin/jboss-cli.sh --file=$BUILD_DIR/wildfly-postgres-connector-java-installer
 echo "Postgres wildfly module installed successfully"
+rm $BUILD_DIR/wildfly-postgres-connector-java-installer
 rm postgresql-$POSTGRES_DRIVER_VERSION.jar
 $JBOSS_HOME/bin/jboss-cli.sh --connect command=:shutdown
 echo "wildfly server stopped"
