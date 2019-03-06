@@ -28,6 +28,10 @@ cd $BUILD_DIR
 source $BP_DIR/.profile.d/jboss.sh
 source $BP_DIR/.profile.d/postgres.sh
 
+# During the build runtime it
+# should be relative instead of a full path
+export JBOSS_HOME=$JBOSS_BUILD_DIR
+
 mkdir -p $JBOSS_FOLDER
 
 echo -n "-----> Installing Wildfly ${WILDFLY_VERSION}... "
