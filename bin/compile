@@ -61,13 +61,12 @@ quit
 EOF
 $JBOSS_HOME/bin/jboss-cli.sh --file=$BUILD_DIR/wildfly-postgres-connector-java-installer
 echo "Postgres wildfly module installed successfully"
-rm $BUILD_DIR/wildfly-postgres-connector-java-installer
-rm postgresql-$POSTGRES_DRIVER_VERSION.jar
 $JBOSS_HOME/bin/jboss-cli.sh --connect command=:shutdown
 echo "wildfly server stopped"
 mv $JBOSS_HOME/standalone/configuration/standalone.xml $JBOSS_HOME/standalone/configuration/standalone.before-patch.xml
 patch $JBOSS_HOME/standalone/configuration/standalone.before-patch.xml -i $BP_DIR/standalone.xml.patch -o $JBOSS_HOME/standalone/configuration/standalone.xml
 echo "standalone.xml datasource configured"
+rm $BUILD_DIR/wildfly-postgres-connector-java-installer
 rm $JBOSS_HOME/postgresql-$POSTGRES_DRIVER_VERSION.jar
 echo "done"
 
