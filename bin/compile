@@ -52,7 +52,6 @@ sha1sum postgresql-$POSTGRES_DRIVER_VERSION.jar | grep $POSTGRES_DRIVER_SHA1 > /
 echo "verified"
 mv postgresql-$POSTGRES_DRIVER_VERSION.jar $JBOSS_HOME
 echo "moved"
-rm postgresql-$POSTGRES_DRIVER_VERSION.jar
 #nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 > /dev/null 2>&1 &
 nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 &
 echo "initializing and waiting for wildfly standalone gets up..."
@@ -65,6 +64,7 @@ quit
 EOF
 $JBOSS_HOME/bin/jboss-cli.sh --file=$TMP_DIR/wildfly-postgres-connector-java-installer
 echo "Postgres wildfly module installed successfully"
+rm postgresql-$POSTGRES_DRIVER_VERSION.jar
 $JBOSS_HOME/bin/jboss-cli.sh --connect command=:shutdown
 echo "wildfly server stopped"
 mv $JBOSS_HOME/standalone/configuration/standalone.xml $JBOSS_HOME/standalone/configuration/standalone.before-patch.xml
