@@ -25,11 +25,13 @@ curl --retry 3 --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-c
 install_java_with_overlay ${BUILD_DIR}
 
 cd $BUILD_DIR
+echo "build_dir is ${BUILD_DIR}"
 
 source $BP_DIR/lib/jboss.sh
 source $BP_DIR/lib/postgres.sh
 
 mkdir -p $JBOSS_HOME
+echo "jboss_home is ${JBOSS_HOME}"
 
 echo -n "-----> Installing Wildfly ${WILDFLY_VERSION}... "
 curl -O http://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz
@@ -50,6 +52,7 @@ sha1sum postgresql-$POSTGRES_DRIVER_VERSION.jar | grep $POSTGRES_DRIVER_SHA1 > /
 echo "verified"
 mv postgresql-$POSTGRES_DRIVER_VERSION.jar $JBOSS_HOME
 echo "moved"
+rm postgresql-$POSTGRES_DRIVER_VERSION.jar
 #nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 > /dev/null 2>&1 &
 nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 &
 echo "initializing and waiting for wildfly standalone gets up..."
