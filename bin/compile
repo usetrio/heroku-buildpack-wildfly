@@ -27,8 +27,8 @@ install_java_with_overlay ${BUILD_DIR}
 cd $BUILD_DIR
 echo "build_dir is ${BUILD_DIR}"
 
-source $BP_DIR/lib/jboss.sh
-source $BP_DIR/lib/postgres.sh
+source $BP_DIR/.profile.d/jboss.sh
+source $BP_DIR/.profile.d/postgres.sh
 
 mkdir -p $JBOSS_HOME
 echo "jboss_home is ${JBOSS_HOME}"
@@ -86,6 +86,4 @@ web: \$JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=\$PORT
 EOF
 fi
 
-cat << EOF > $BUILD_DIR/.profile.d/jboss.sh
-export JBOSS_HOME=${JBOSS_HOME}
-EOF
+mv $BP_DIR/.profile.d/* $BUILD_DIR/.profile.d/
