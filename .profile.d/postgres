@@ -6,6 +6,9 @@ set -e
 
 IFS=':' read -r -a variables <<< "$DATABASE_URL"
 export POSTGRES_DB_USER=(${variables[1]//\/\//})
+echo "POSTGRES_DB_USER is $POSTGRES_DB_USER"
 IFS='@' read -r -a PASSWORD_HOST <<< "${variables[2]}"
 export POSTGRES_DB_PASS=${PASSWORD_HOST[0]}
+echo "POSTGRES_DB_PASS is $POSTGRES_DB_PASS"
 export POSTGRES_DB_HOST="jdbc:postgresql://${PASSWORD_HOST[1]}:${variables[3]}${POSTGRES_DB_HOST_ARGS}"
+echo "POSTGRES_DB_HOST is $POSTGRES_DB_HOST"
