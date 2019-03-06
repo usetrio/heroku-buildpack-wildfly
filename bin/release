@@ -1,2 +1,7 @@
 #!/usr/bin/env bash
 # bin/release <build-dir>
+
+set -e
+
+source $BP_DIR/.profile.d/jboss
+source $BP_DIR/.profile.d/postgres
