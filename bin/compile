@@ -12,6 +12,7 @@ ENV_DIR=$3
 TMP_DIR=/tmp
 
 source $BP_DIR/.profile.d/jboss
+source $BP_DIR/.profile.d/postgres
 
 JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-"https://codon-buildpacks.s3.amazonaws.com/buildpacks/heroku/jvm-common.tgz"}
 mkdir -p /tmp/jvm-common
