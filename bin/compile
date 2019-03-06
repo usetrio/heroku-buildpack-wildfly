@@ -24,7 +24,7 @@ install_java_with_overlay ${BUILD_DIR}
 
 cd $BUILD_DIR
 
-mkdir -p .jboss
+mkdir -p $JBOSS_HOME
 
 echo -n "-----> Installing Wildfly ${WILDFLY_VERSION}... "
 curl -O http://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz
