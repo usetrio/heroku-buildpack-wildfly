@@ -45,7 +45,7 @@ sha1sum postgresql-$POSTGRES_DRIVER_VERSION.jar | grep $POSTGRES_DRIVER_SHA1 > /
 echo "verified"
 mv postgresql-$POSTGRES_DRIVER_VERSION.jar $JBOSS_HOME
 echo "moved"
-nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 > $JBOSS/jboss.log 2>&1 &
+nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 > $JBOSS_HOME/jboss.log 2>&1 &
 echo "initializing and waiting for wildfly standalone gets up..."
 until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do printf '.'; sleep 5; done
 cat << EOF > $TMP_DIR/wildfly-postgres-connector-java-installer
