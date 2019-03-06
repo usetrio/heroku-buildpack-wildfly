@@ -11,8 +11,8 @@ CACHE_DIR=$2
 ENV_DIR=$3
 TMP_DIR=/tmp
 
-source $BP_DIR/.profile.d/jboss
-source $BP_DIR/.profile.d/postgres
+BUILDPACK_STDLIB_URL="https://lang-common.s3.amazonaws.com/buildpack-stdlib/v7/stdlib.sh"
+source <(curl -s --retry 3 -L $BUILDPACK_STDLIB_URL)
 
 JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-"https://codon-buildpacks.s3.amazonaws.com/buildpacks/heroku/jvm-common.tgz"}
 mkdir -p /tmp/jvm-common
