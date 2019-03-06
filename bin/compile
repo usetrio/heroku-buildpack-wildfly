@@ -28,7 +28,7 @@ cd $BUILD_DIR
 source $BP_DIR/.profile.d/jboss.sh
 source $BP_DIR/.profile.d/postgres.sh
 
-mkdir -p $JBOSS_HOME
+mkdir -p $JBOSS_BUILD_DIR
 
 echo -n "-----> Installing Wildfly ${WILDFLY_VERSION}... "
 curl -O http://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz
@@ -37,7 +37,7 @@ sha1sum wildfly-$WILDFLY_VERSION.tar.gz | grep $WILDFLY_SHA1 > /dev/null 2>&1
 echo "verified"
 tar xf wildfly-$WILDFLY_VERSION.tar.gz
 echo "extracted"
-mv wildfly-$WILDFLY_VERSION/* $JBOSS_HOME
+mv wildfly-$WILDFLY_VERSION/* $JBOSS_BUILD_DIR
 echo "moved"
 rm wildfly-$WILDFLY_VERSION.tar.gz
 echo "done"
@@ -47,31 +47,31 @@ curl -O http://central.maven.org/maven2/org/postgresql/postgresql/$POSTGRES_DRIV
 echo "downloaded"
 sha1sum postgresql-$POSTGRES_DRIVER_VERSION.jar | grep $POSTGRES_DRIVER_SHA1 > /dev/null 2>&1
 echo "verified"
-mv postgresql-$POSTGRES_DRIVER_VERSION.jar $JBOSS_HOME
+mv postgresql-$POSTGRES_DRIVER_VERSION.jar $JBOSS_BUILD_DIR
 echo "moved"
-#nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 > /dev/null 2>&1 &
-nohup $JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 &
+#nohup $JBOSS_BUILD_DIR/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 > /dev/null 2>&1 &
+nohup $JBOSS_BUILD_DIR/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=8080 &
 echo "initializing and waiting for wildfly standalone gets up..."
 until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do printf '.'; sleep 5; done
 cat << EOF > $BUILD_DIR/wildfly-postgres-connector-java-installer
 connect
-module add --name=org.postgresql --resources=$JBOSS_HOME/postgresql-$POSTGRES_DRIVER_VERSION.jar --dependencies=javax.api,javax.transaction.api
+module add --name=org.postgresql --resources=$JBOSS_BUILD_DIR/postgresql-$POSTGRES_DRIVER_VERSION.jar --dependencies=javax.api,javax.transaction.api
 /subsystem=datasources/jdbc-driver=postgresql:add(driver-name="postgresql",driver-module-name="org.postgresql",driver-class-name=org.postgresql.Driver)
 quit
 EOF
-$JBOSS_HOME/bin/jboss-cli.sh --file=$BUILD_DIR/wildfly-postgres-connector-java-installer
+$JBOSS_BUILD_DIR/bin/jboss-cli.sh --file=$BUILD_DIR/wildfly-postgres-connector-java-installer
 echo "Postgres wildfly module installed successfully"
-$JBOSS_HOME/bin/jboss-cli.sh --connect command=:shutdown
+$JBOSS_BUILD_DIR/bin/jboss-cli.sh --connect command=:shutdown
 echo "wildfly server stopped"
-mv $JBOSS_HOME/standalone/configuration/standalone.xml $JBOSS_HOME/standalone/configuration/standalone.before-patch.xml
-patch $JBOSS_HOME/standalone/configuration/standalone.before-patch.xml -i $BP_DIR/standalone.xml.patch -o $JBOSS_HOME/standalone/configuration/standalone.xml
+mv $JBOSS_BUILD_DIR/standalone/configuration/standalone.xml $JBOSS_BUILD_DIR/standalone/configuration/standalone.before-patch.xml
+patch $JBOSS_BUILD_DIR/standalone/configuration/standalone.before-patch.xml -i $BP_DIR/standalone.xml.patch -o $JBOSS_BUILD_DIR/standalone/configuration/standalone.xml
 echo "standalone.xml datasource configured"
 rm $BUILD_DIR/wildfly-postgres-connector-java-installer
-rm $JBOSS_HOME/postgresql-$POSTGRES_DRIVER_VERSION.jar
+rm $JBOSS_BUILD_DIR/postgresql-$POSTGRES_DRIVER_VERSION.jar
 echo "done"
 
 echo -n "-----> Deploying war file(s)..."
-find ./target -name \*.war -exec cp {} $JBOSS_HOME/standalone/deployments \;
+find ./target -name \*.war -exec cp {} $JBOSS_BUILD_DIR/standalone/deployments \;
 echo "done"
 
 echo "-----> Creating configuration..."
@@ -79,7 +79,7 @@ if [ -f $BUILD_DIR/Procfile ]; then
   echo "        - Using existing process types"
 else
   cat << EOF > $BUILD_DIR/Procfile
-web: \$JBOSS_HOME/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=\$PORT
+web: \$JBOSS_BUILD_DIR/bin/standalone.sh -b=0.0.0.0 -Djboss.http.port=\$PORT
 EOF
 fi
 
