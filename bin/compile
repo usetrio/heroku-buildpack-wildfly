@@ -58,6 +58,8 @@ cat << EOF > $BUILD_DIR/wildfly-postgres-connector-java-installer
 connect
 module add --name=org.postgresql --resources=$JBOSS_BUILD_DIR/postgresql-$POSTGRES_DRIVER_VERSION.jar --dependencies=javax.api,javax.transaction.api
 /subsystem=datasources/jdbc-driver=postgresql:add(driver-name="postgresql",driver-module-name="org.postgresql",driver-class-name=org.postgresql.Driver)
+/subsystem=ee:write-attribute(name="spec-descriptor-property-replacement",value=true)
+/subsystem=ee:write-attribute(name="jboss-descriptor-property-replacement",value=true)
 quit
 EOF
 $JBOSS_BUILD_DIR/bin/jboss-cli.sh --file=$BUILD_DIR/wildfly-postgres-connector-java-installer
